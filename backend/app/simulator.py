@@ -75,7 +75,7 @@ class Simulator:
 
         for sector in range(0, 360, step):
             for idx in range(per_sector):
-                azimuth = sector + (idx + 0.5) * (step / per_sector)
+                azimuth = sector + (step / 2.0)
                 range_m = max_range_m * (0.1 + 0.9 * (idx + 1) / per_sector)
                 velocity = self._rand.uniform(-35.0, 35.0)
                 rcs_min, rcs_max = self.settings.rcs_m2_range
