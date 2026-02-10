@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: "phoenix_tracks"
+      POSTGRES_USER: "phoenix"
+      POSTGRES_PASSWORD: "phoenix"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "postgresql://phoenix:phoenix@db:5432/phoenix_tracks"
+      PRF_HZ: "250"
+      SECTOR_STEP_DEG: "10"
+      TARGETS_PER_SECTOR: "20"
+      MAX_RANGE_KM: "240"
+      RCS_M2_RANGE: "0.1,100"
+      ALLOWED_ORIGINS: "http://localhost:3000"
+      SIM_SEED: "42"
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: "http://localhost:8000"
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+      - db
+
+volumes:
+  db_data:
